@@ -1,0 +1,389 @@
+# 📚 Prova Kotlin — Conta Bancária (Explicação Completa)
+
+Esse guia explica **linha por linha** o código da prova, pra você entender exatamente o que foi feito e por quê.
+
+-----
+
+## 🎯 O QUE A PROVA PEDIU
+
+1. Criar uma classe `ContaBancaria` com:
+- Atributo `nome` (do usuário).
+- Atributo **privado** `saldo`.
+- Método `sacar` → se a quantidade for maior que o saldo, impossível. Se for menor, saca.
+- Método `depositar` → se for negativo, impossível. Se for positivo, deposita.
+- Método `get` pra acessar o saldo (já que é privado).
+1. Criar uma função pública (fora da classe) chamada `exibirExtrato` que:
+- Recebe um objeto do tipo `ContaBancaria`.
+- Mostra o nome + o saldo (usando o `get`).
+1. Criar a `main` com um menu contendo:
+- Depositar
+- Sacar
+- Exibir Extrato
+- Sair
+
+-----
+
+## 🧱 PARTE 1 — A CLASSE `ContaBancaria`
+
+### Cabeçalho da classe
+
+```kotlin
+class ContaBancaria(val nome: String) {
+```
+
+- `class ContaBancaria(...)` → cria a classe.
+- `(val nome: String)` → é o **construtor primário**. Sempre que criar uma `ContaBancaria` nova, vai precisar passar um nome.
+- `val` → significa que `nome` é **imutável** (não pode mudar depois que a conta foi criada).
+
+### Atributo privado saldo
+
+```kotlin
+private var saldo: Double = 0.0
+```
+
+- `private` → ninguém de fora da classe consegue acessar direto. Só métodos da própria classe.
+- `var` → o saldo **pode mudar** (vai aumentar e diminuir).
+- `Double` → número com casas decimais (porque dinheiro tem centavos).
+- `= 0.0` → começa zerado.
+
+> 💡 Por que `Double` e não `Int`? Porque dinheiro tem centavos. Se a prova permitir Int, pode usar Int também — funciona igual.
+
+-----
+
+### Método `sacar`
+
+```kotlin
+fun sacar(quantia: Double) {
+if (quantia > saldo) {
+println("Impossivel sacar. Saldo insuficiente.")
+} else {
+saldo -= quantia
+println("Saque realizado com sucesso!")
+}
+}
+```
+
+**O que ele faz:**
+
+1. Recebe um valor (`quantia`).
+1. Se a quantia for **maior que o saldo** → não pode sacar (não tem dinheiro suficiente).
+1. Se for **menor ou igual** → tira a quantia do saldo (`saldo -= quantia` é o mesmo que `saldo = saldo - quantia`).
+
+**Por que isso funciona:**
+A gente compara o que ele quer tirar com o que ele tem. Não dá pra sacar mais do que tem, né?
+
+-----
+
+### Método `depositar`
+
+```kotlin
+fun depositar(quantia: Double) {
+if (quantia < 0) {
+println("Impossivel depositar valor negativo.")
+} else {
+saldo += quantia
+println("Deposito realizado com sucesso!")
+}
+}
+```
+
+**O que ele faz:**
+
+1. Recebe um valor.
+1. Se for negativo → não deixa depositar (não faz sentido depositar -50 reais).
+1. Se for positivo → soma no saldo (`saldo += quantia` é o mesmo que `saldo = saldo + quantia`).
+
+-----
+
+### Método `getSaldo`
+
+```kotlin
+fun getSaldo(): Double {
+return saldo
+}
+```
+
+**Por que precisa disso?**
+
+Como o `saldo` é `private`, ninguém de fora consegue acessar ele direto. Tipo, **isso aqui daria erro:**
+
+```kotlin
+val conta = ContaBancaria("Joao")
+println(conta.saldo) // ❌ ERRO! saldo é privado
+```
+
+A solução é criar um **método público que devolve o saldo**. É isso que o `getSaldo()` faz:
+
+- `fun getSaldo()` → função pública (sem `private`).
+- `: Double` → vai retornar um número decimal.
+- `return saldo` → devolve o valor do atributo privado.
+
+Aí de fora você usa assim:
+
+```kotlin
+println(conta.getSaldo()) // ✅ FUNCIONA
+```
+
+> 💡 **Conceito:** isso se chama **encapsulamento**. Você “esconde” o atributo (private) e só deixa acessar através de um método. Assim você controla quem pode ver e como.
+
+-----
+
+## 📋 PARTE 2 — FUNÇÃO `exibirExtrato` (fora da classe)
+
+```kotlin
+fun exibirExtrato(conta: ContaBancaria) {
+println("Cliente: ${conta.nome}")
+println("Saldo: R$ ${conta.getSaldo()}")
+}
+```
+
+**Detalhes importantes:**
+
+- Essa função fica **FORA da classe** (no nível principal do arquivo).
+- Recebe um parâmetro do tipo `ContaBancaria`.
+- Mostra o nome (que é público, então pode acessar direto com `conta.nome`).
+- Mostra o saldo usando `conta.getSaldo()` (porque saldo é privado, lembra?).
+
+**Sobre `${conta.nome}`:**
+
+- Em Kotlin, pra colocar uma variável dentro de uma String, você usa `$variavel`.
+- Quando é uma expressão composta (com `.`, cálculo, chamada de método), usa `${...}` com chaves.
+- Ex: `"Ola, $nome"` → simples, só uma variável.
+- Ex: `"Saldo: ${conta.getSaldo()}"` → expressão composta, precisa das chaves.
+
+-----
+
+## 🎛️ PARTE 3 — A FUNÇÃO `main` COM O MENU
+
+### Início
+
+```kotlin
+fun main() {
+print("Digite o nome do titular: ")
+val nome = readln()
+val conta = ContaBancaria(nome)
+```
+
+- Pede o nome do titular.
+- `readln()` → lê o que o usuário digitar e guarda em `nome`.
+- `val conta = ContaBancaria(nome)` → **cria um objeto** (uma instância) da classe ContaBancaria, passando o nome.
+
+> 💡 Pensa assim: a classe é a **planta da casa**. O objeto (`conta`) é a **casa construída**. Você precisa “construir” uma instância pra usar.
+
+### Variável de controle do loop
+
+```kotlin
+var opcao = 0
+```
+
+Começa em 0 só pra ter um valor inicial. Vai ser alterado pelo que o usuário digitar.
+
+### O loop `do-while`
+
+```kotlin
+do {
+println("\n--- MENU ---")
+println("1 - Depositar")
+println("2 - Sacar")
+println("3 - Exibir Extrato")
+println("4 - Sair")
+print("Escolha uma opcao: ")
+opcao = readln().toInt()
+
+when (opcao) {
+// ...
+}
+} while (opcao != 4)
+```
+
+**Por que `do-while` e não `while`?**
+
+- `do-while` → executa **pelo menos uma vez** antes de checar a condição.
+- Ideal pra menu, porque você sempre quer mostrar o menu pelo menos uma vez.
+
+**Como ele funciona:**
+
+1. Mostra o menu.
+1. Lê a opção do usuário com `readln().toInt()`.
+1. O `.toInt()` converte o texto em número (porque `readln()` retorna String).
+1. O `when` decide o que fazer.
+1. Volta pro topo se `opcao != 4`. Se `opcao == 4`, sai do loop.
+
+### O `when`
+
+```kotlin
+when (opcao) {
+1 -> {
+print("Digite o valor para depositar: ")
+val valor = readln().toDouble()
+conta.depositar(valor)
+}
+2 -> {
+print("Digite o valor para sacar: ")
+val valor = readln().toDouble()
+conta.sacar(valor)
+}
+3 -> exibirExtrato(conta)
+4 -> println("Saindo...")
+else -> println("Opcao invalida")
+}
+```
+
+**Cada caso:**
+
+- **Opção 1 (Depositar):** pede o valor, converte pra Double com `.toDouble()`, chama `conta.depositar(valor)`.
+- **Opção 2 (Sacar):** mesma coisa, mas chama `conta.sacar(valor)`.
+- **Opção 3 (Exibir Extrato):** chama a função `exibirExtrato(conta)` passando o objeto.
+- **Opção 4 (Sair):** mostra “Saindo…” e o loop encerra (porque `opcao != 4` vira falso).
+- **else:** se digitar qualquer outra coisa (5, 99, etc.), avisa que é inválido.
+
+**Por que usar chaves `{}` na opção 1 e 2?**
+Porque tem **mais de uma linha** dentro. Quando é só uma linha (como na 3, 4 e else), não precisa de chaves.
+
+-----
+
+## 🔑 CONCEITOS QUE A PROVA TESTA
+
+### 1. Classe e construtor primário
+
+```kotlin
+class ContaBancaria(val nome: String)
+```
+
+### 2. Atributo privado
+
+```kotlin
+private var saldo: Double = 0.0
+```
+
+### 3. Método sem retorno (Unit)
+
+```kotlin
+fun sacar(quantia: Double) {
+// ...
+}
+```
+
+### 4. Método com retorno
+
+```kotlin
+fun getSaldo(): Double {
+return saldo
+}
+```
+
+### 5. Função pública fora da classe
+
+```kotlin
+fun exibirExtrato(conta: ContaBancaria) {
+// ...
+}
+```
+
+### 6. Estrutura `if/else`
+
+```kotlin
+if (condicao) {
+// ...
+} else {
+// ...
+}
+```
+
+### 7. Estrutura `when`
+
+```kotlin
+when (variavel) {
+valor1 -> acao1
+valor2 -> acao2
+else -> acaoPadrao
+}
+```
+
+### 8. Loop `do-while`
+
+```kotlin
+do {
+// codigo
+} while (condicao)
+```
+
+### 9. Lendo do teclado
+
+```kotlin
+val texto = readln() // String
+val numero = readln().toInt() // Int
+val decimal = readln().toDouble() // Double
+```
+
+### 10. Template strings
+
+```kotlin
+println("Nome: $nome")
+println("Saldo: ${conta.getSaldo()}")
+```
+
+-----
+
+## ⚠️ ERROS COMUNS NESSE TIPO DE PROVA
+
+### ❌ Tentar acessar atributo privado direto
+
+```kotlin
+println(conta.saldo) // ERRO! saldo é privado
+```
+
+✅ Use o método get:
+
+```kotlin
+println(conta.getSaldo())
+```
+
+### ❌ Esquecer o `private` no atributo
+
+```kotlin
+var saldo: Double = 0.0 // ERRO! a prova pediu privado
+```
+
+✅ Correto:
+
+```kotlin
+private var saldo: Double = 0.0
+```
+
+### ❌ Esquecer o tipo de retorno no get
+
+```kotlin
+fun getSaldo() { // ERRO! falta o : Double
+return saldo
+}
+```
+
+✅ Correto:
+
+```kotlin
+fun getSaldo(): Double {
+return saldo
+}
+```
+
+### ❌ Usar `toInt()` quando deveria ser `toDouble()`
+
+Se você usar `readln().toInt()` pra depositar/sacar, vai dar erro se o usuário digitar `100.50`. Pra valores monetários, use `.toDouble()`.
+
+### ❌ Colocar `exibirExtrato` dentro da classe
+
+A prova pediu **função pública FORA da classe**. Então fica no nível principal do arquivo, não dentro de `class ContaBancaria { }`.
+
+-----
+
+## ✅ RESUMÃO PRA NÃO ESQUECER
+
+1. Classe com `nome` (val) e `saldo` (private var).
+1. Métodos `sacar` e `depositar` com validações.
+1. Método `getSaldo()` pra acessar o saldo de fora.
+1. Função `exibirExtrato(conta: ContaBancaria)` **fora** da classe.
+1. `main` com menu em `do-while` + `when` (4 opções).
+1. Lê opção com `readln().toInt()`, valores com `.toDouble()`.
+
+**É isso. Tá feito.** 🎯

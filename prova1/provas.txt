@@ -1,0 +1,76 @@
+
+BERNARDO ARAUJO IANNINI <12502421@aluno.cotemig.com.br>
+09:52 (há 20 minutos)
+para mim
+
+class ContaBancaria(val nome: String) {
+
+```
+private var saldo: Double = 0.0
+
+fun sacar(quantia: Double) {
+if (quantia > saldo) {
+println("Impossivel sacar. Saldo insuficiente.")
+} else {
+saldo -= quantia
+println("Saque realizado com sucesso!")
+}
+}
+
+fun depositar(quantia: Double) {
+if (quantia < 0) {
+println("Impossivel depositar valor negativo.")
+} else {
+saldo += quantia
+println("Deposito realizado com sucesso!")
+}
+}
+
+fun getSaldo(): Double {
+return saldo
+}
+```
+
+}
+
+fun exibirExtrato(conta: ContaBancaria) {
+println(“Cliente: ${conta.nome}”)
+println(“Saldo: R$ ${conta.getSaldo()}”)
+}
+
+fun main() {
+print(“Digite o nome do titular: “)
+val nome = readln()
+val conta = ContaBancaria(nome)
+
+```
+var opcao = 0
+
+do {
+println("\n--- MENU ---")
+println("1 - Depositar")
+println("2 - Sacar")
+println("3 - Exibir Extrato")
+println("4 - Sair")
+print("Escolha uma opcao: ")
+opcao = readln().toInt()
+
+when (opcao) {
+1 -> {
+print("Digite o valor para depositar: ")
+val valor = readln().toDouble()
+conta.depositar(valor)
+}
+2 -> {
+print("Digite o valor para sacar: ")
+val valor = readln().toDouble()
+conta.sacar(valor)
+}
+3 -> exibirExtrato(conta)
+4 -> println("Saindo...")
+else -> println("Opcao invalida")
+}
+} while (opcao != 4)
+```
+
+}
